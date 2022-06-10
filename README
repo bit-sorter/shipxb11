@@ -1,0 +1,13 @@
+
+To build
+========
+
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+make
+su -c "make install"
+
+
+Font from https://karenbjones.com
+Most graphics from https://opengameart.org/content/spaceship-set-32x32px

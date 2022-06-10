@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.13)
+
+project(shipxb11 VERSION 0.9)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
+
+find_package(PkgConfig REQUIRED)
+find_package(SDL2 REQUIRED)
+
+pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
+pkg_check_modules(SDL2_GFX REQUIRED SDL2_gfx)
+pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_GFX_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
+link_directories(${SDL2_LIBRARY_DIRS} ${SDL2_IMAGE_LIBRARY_DIRS} ${SDL2_GFX_LIBRARY_DIRS} ${SDL2_TTF_LIBRARY_DIRS})
+set(LIBRARIES ${LIBRARIES} ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2_GFX_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+
+include(GNUInstallDirs)
+add_definitions(-DDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/shipxb11")
+add_executable(shipxb11 ${PROJECT_SOURCE_DIR}/shipxb11.c)
+target_link_libraries(shipxb11 ${LIBRARIES})
+
+install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/shipxb11)
+install(TARGETS shipxb11 DESTINATION bin)
+
