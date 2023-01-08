@@ -1769,8 +1769,7 @@ static int init(Game *game)
     return 1;
   }
 
-  game->renderer = SDL_CreateRenderer(game->window, -1,
-                                      SDL_RENDERER_ACCELERATED);
+  game->renderer = SDL_CreateRenderer(game->window, -1, 0);
 
   if (game->renderer == NULL) {
     fprintf(stderr, "%s: In function %s ", game->title, __func__);
