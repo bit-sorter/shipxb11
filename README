@@ -7,7 +7,11 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 make
-su -c "make install"
+
+To install
+==========
+On Linux and similar: su -c "make install"
+On Windows, as admin, make install
 
 
 Font from https://karenbjones.com
