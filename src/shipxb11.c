@@ -884,7 +884,7 @@ static int handle_event(Game *game, SDL_Event *event)
 	return 1;
 }
 
-static void get_texture_dimensions(SDL_Texture *texture , int *width,	 int *height)
+static void get_texture_dimensions(SDL_Texture *texture, int *width, int *height)
 {
 	int acc;
 	Uint32 format;
@@ -1506,12 +1506,15 @@ static int play_game(Game *game)
 		}
 
 		if (game->paused) {
+			SDL_Rect srect = { 0, 0, game->width, game->height };
+			SDL_Rect drect = { 0, 0, game->width, game->height };
+
 			if (game->pause_screen != NULL) {
-				SDL_Rect srect = { 0, 0, game->width, game->height };
-				SDL_Rect drect = { 0, 0, game->width, game->height };
 				SDL_RenderCopy(game->renderer, game->pause_screen, &srect, &drect);
+			} else {
+				SDL_RenderCopy(game->renderer, game->background.texture[0], &srect, &drect);
 			}
-			
+
 			if (game->lives == 0) {
 				show_game_over_message(game); 
 			}	 
