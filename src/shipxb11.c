@@ -59,13 +59,6 @@ typedef struct {
 } Audio;
 
 typedef struct {
-	double x;
-	double y;
-	int w;
-	int h;
-} Rect;
-
-typedef struct {
 	SDL_bool is_animated;
 	SDL_bool is_visible;
 	double dx;
