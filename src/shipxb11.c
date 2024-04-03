@@ -18,7 +18,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
-#include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_rotozoom.h>
 #include <SDL2/SDL_ttf.h>
@@ -54,7 +53,6 @@ typedef struct {
 	AudioInfo audio_info[MAX_SOUNDS];
 	SDL_AudioDeviceID id;
 	SDL_AudioSpec device_spec;
-	SDL_Thread *audio_thread;
 	unsigned int index;
 } Audio;
 
@@ -122,7 +120,6 @@ typedef struct {
 	Sprite missile;
 	Sprite big_blue_missiles;
 	Sprite playmis;
-	SDL_bool in_thread;
 	SDL_Texture *game_over_message;
 	SDL_Texture *paused_message[PAUSE_MSG];
 	SDL_Texture *pause_screen;
@@ -139,7 +136,6 @@ static void init_audio(Game *game)
 	int status = 1;
 	game->audio.index = 0;
 	game->audio.playing = SDL_FALSE;
-	game->audio.audio_thread = NULL;
 
 	for (unsigned int i = 0; i < MAX_SOUNDS; i++) {
 		game->audio.audio_info[i].wave_buffer = NULL;
@@ -177,10 +173,6 @@ static void init_audio(Game *game)
 
 static void close_audio(Game *game)
 {
-	if (game->audio.audio_thread != NULL) {
-		SDL_WaitThread(game->audio.audio_thread, NULL);
-	}
-
 	SDL_CloseAudioDevice(game->audio.id);
 
 	for (unsigned int i = 0; i < game->audio.index; i++) {
@@ -194,15 +186,6 @@ static void close_audio(Game *game)
 			SDL_FreeWAV(game->audio.audio_info[i].wave_buffer);
 		}
 	}
-}
-
-static int play_explosion_sound(Game *game)
-{
-	game->in_thread = SDL_TRUE;
-	SDL_ClearQueuedAudio(game->audio.id);
-	SDL_QueueAudio(game->audio.id, game->audio.audio_info[0].wave_buffer, game->audio.audio_info[0].wave_length);
-	game->in_thread = SDL_FALSE;
-	return 0;
 }
 
 static int load_audio(Game *game, const char *path)
@@ -260,7 +243,6 @@ static void init_game(Game *game)
 	}
 
 	game->paused = SDL_TRUE;
-	game->in_thread = SDL_FALSE;
 	game->title = GAME_TITLE;
 	game->score.visible_high = 0;
 	game->score.high = 0;
@@ -747,9 +729,10 @@ static void explode(Game *game, Craft *craft)
 		}
 	}
 
-	if (game->audio.id != 0 && !game->in_thread && !game->audio.playing) {
-		game->audio.audio_thread = SDL_CreateThread(play_explosion_sound, "Explosion", game);
+	if (game->audio.playing == SDL_FALSE) {
 		game->audio.playing = SDL_TRUE;
+		SDL_ClearQueuedAudio(game->audio.id);
+		SDL_QueueAudio(game->audio.id, game->audio.audio_info[0].wave_buffer, game->audio.audio_info[0].wave_length);
 	}
 }
 
